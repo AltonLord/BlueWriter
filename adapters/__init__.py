@@ -1,7 +1,8 @@
 """
-BlueWriter Adapters Package.
+BlueWriter Qt Adapters Package.
 
-Contains UI framework adapters that bridge the event bus to specific UI toolkits.
+Provides adapters that bridge framework-agnostic services
+to specific UI frameworks (currently Qt/PySide6).
 """
 from adapters.qt_adapter import QtEventAdapter
 

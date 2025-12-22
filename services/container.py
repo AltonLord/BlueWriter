@@ -1,9 +1,11 @@
 """
-Service Container for BlueWriter.
+Service initialization for BlueWriter.
 
-Provides centralized initialization and access to all services.
+Provides factory functions to create and wire up all services
+with the event bus and Qt adapter.
 """
-from typing import Dict, Any
+from typing import Dict, Any, Optional
+from pathlib import Path
 
 from events.event_bus import EventBus
 from services.project_service import ProjectService
@@ -14,75 +16,104 @@ from services.canvas_service import CanvasService
 from services.editor_service import EditorService
 
 
-class ServiceContainer:
-    """
-    Container for all BlueWriter services.
+def create_services(db_path: str, event_bus: EventBus) -> Dict[str, Any]:
+    """Create all service instances.
     
-    Provides centralized initialization and access to services,
-    event bus, and related infrastructure.
+    Args:
+        db_path: Path to the SQLite database
+        event_bus: EventBus for publishing events
+        
+    Returns:
+        Dictionary of service instances keyed by name
+    """
+    return {
+        'project': ProjectService(db_path, event_bus),
+        'story': StoryService(db_path, event_bus),
+        'chapter': ChapterService(db_path, event_bus),
+        'encyclopedia': EncyclopediaService(db_path, event_bus),
+        'canvas': CanvasService(event_bus),
+        'editor': EditorService(event_bus),
+    }
+
+
+class ServiceContainer:
+    """Container for all BlueWriter services.
+    
+    Provides convenient access to services and manages their lifecycle.
     
     Usage:
         container = ServiceContainer(db_path)
         projects = container.project.list_projects()
-        container.start_api_server()
+        container.chapter.create_chapter(...)
     """
     
-    def __init__(self, db_path: str):
-        """
-        Initialize the service container.
+    def __init__(self, db_path: str, event_bus: Optional[EventBus] = None):
+        """Initialize the service container.
         
         Args:
             db_path: Path to the SQLite database
+            event_bus: Optional EventBus (creates one if not provided)
         """
         self.db_path = db_path
-        
-        # Create event bus
-        self.event_bus = EventBus()
-        
-        # Create all services
-        self.project = ProjectService(db_path, self.event_bus)
-        self.story = StoryService(db_path, self.event_bus)
-        self.chapter = ChapterService(db_path, self.event_bus)
-        self.encyclopedia = EncyclopediaService(db_path, self.event_bus)
-        self.canvas = CanvasService(self.event_bus)
-        self.editor = EditorService(self.event_bus)
-        
-        # API server state
-        self._api_thread = None
-        self._api_port = 5000
+        self.event_bus = event_bus or EventBus()
+        self._services = create_services(db_path, self.event_bus)
     
-    def get_services_dict(self) -> Dict[str, Any]:
-        """Get services as a dictionary (for API initialization)."""
-        return {
-            'project': self.project,
-            'story': self.story,
-            'chapter': self.chapter,
-            'encyclopedia': self.encyclopedia,
-            'canvas': self.canvas,
-            'editor': self.editor,
-        }
+    @property
+    def project(self) -> ProjectService:
+        """Get the ProjectService."""
+        return self._services['project']
     
-    def start_api_server(self, port: int = 5000) -> None:
+    @property
+    def story(self) -> StoryService:
+        """Get the StoryService."""
+        return self._services['story']
+    
+    @property
+    def chapter(self) -> ChapterService:
+        """Get the ChapterService."""
+        return self._services['chapter']
+    
+    @property
+    def encyclopedia(self) -> EncyclopediaService:
+        """Get the EncyclopediaService."""
+        return self._services['encyclopedia']
+    
+    @property
+    def canvas(self) -> CanvasService:
+        """Get the CanvasService."""
+        return self._services['canvas']
+    
+    @property
+    def editor(self) -> EditorService:
+        """Get the EditorService."""
+        return self._services['editor']
+    
+    def as_dict(self) -> Dict[str, Any]:
+        """Get all services as a dictionary (for API injection)."""
+        return self._services.copy()
+    
+    def start_api_server(self, host: str = "127.0.0.1", port: int = 5000) -> None:
         """Start the REST API server in a background thread.
         
         Args:
+            host: Host to bind to (default: localhost)
             port: Port to listen on (default: 5000)
         """
-        from api.launcher import start_api_server
-        
+        from api.startup import start_api_server
+        self._api_host = host
         self._api_port = port
-        self._api_thread = start_api_server(
-            services=self.get_services_dict(),
-            port=port,
-        )
+        self._api_thread = start_api_server(self._services, host, port)
+    
+    def get_api_url(self) -> str:
+        """Get the URL where the API server is running."""
+        host = getattr(self, '_api_host', '127.0.0.1')
+        port = getattr(self, '_api_port', 5000)
+        return f"http://{host}:{port}"
     
     def is_api_running(self) -> bool:
         """Check if the API server is running."""
-        return self._api_thread is not None and self._api_thread.is_alive()
-    
-    def get_api_url(self) -> str:
-        """Get the API server URL."""
-        return f"http://127.0.0.1:{self._api_port}"
+        thread = getattr(self, '_api_thread', None)
+        return thread is not None and thread.is_alive()
 
 
-__all__ = ['ServiceContainer']
+__all__ = ['create_services', 'ServiceContainer']

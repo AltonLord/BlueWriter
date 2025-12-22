@@ -2,7 +2,7 @@
 Qt Event Adapter for BlueWriter.
 
 Bridges the framework-agnostic EventBus to Qt signals,
-ensuring all UI updates happen on the main thread.
+ensuring all UI updates happen on the main Qt thread.
 """
 from typing import List
 
@@ -43,7 +43,7 @@ from events.events import (
     # Editor events
     EditorStateChanged,
     EditorModifiedChanged,
-    # App events
+    # Application events
     AppStateChanged,
     SaveRequested,
     SaveCompleted,
@@ -52,10 +52,10 @@ from events.events import (
 
 class QtEventAdapter(QObject):
     """
-    Bridges EventBus to Qt signals.
+    Bridges EventBus events to Qt signals.
     
     Subscribes to all event types on the EventBus and emits
-    corresponding Qt signals. Uses a QTimer to poll for pending
+    corresponding Qt signals. Uses a QTimer to poll for
     events from background threads.
     
     Usage:
@@ -84,7 +84,7 @@ class QtEventAdapter(QObject):
     chapter_updated = Signal(int, list)  # chapter_id, fields_changed
     chapter_deleted = Signal(int, int)  # chapter_id, story_id
     chapter_moved = Signal(int, int, int, int, int)  # id, old_x, old_y, new_x, new_y
-    chapter_color_changed = Signal(int, str, str)  # chapter_id, old_color, new_color
+    chapter_color_changed = Signal(int, str, str)  # id, old_color, new_color
     chapter_opened = Signal(int)  # chapter_id
     chapter_closed = Signal(int)  # chapter_id
     
@@ -103,18 +103,17 @@ class QtEventAdapter(QObject):
     editor_state_changed = Signal(str, int, bool)  # editor_type, item_id, is_open
     editor_modified_changed = Signal(str, int, bool)  # editor_type, item_id, is_modified
     
-    # === App Signals ===
+    # === Application Signals ===
     app_state_changed = Signal(object, object)  # current_project_id, current_story_id (can be None)
     save_requested = Signal(bool)  # save_all
     save_completed = Signal(int, bool, str)  # items_saved, success, error_message
     
     def __init__(self, event_bus: EventBus, parent=None):
-        """
-        Initialize the Qt event adapter.
+        """Initialize the Qt event adapter.
         
         Args:
             event_bus: The EventBus to subscribe to
-            parent: Qt parent object (typically MainWindow)
+            parent: Parent QObject (typically MainWindow)
         """
         super().__init__(parent)
         self.event_bus = event_bus
@@ -128,7 +127,7 @@ class QtEventAdapter(QObject):
         self._timer.start(50)  # 50ms polling interval
     
     def _subscribe_to_events(self) -> None:
-        """Subscribe to all event types on the EventBus."""
+        """Subscribe to all event types on the event bus."""
         # Project events
         self.event_bus.subscribe(ProjectCreated, self._on_project_created)
         self.event_bus.subscribe(ProjectUpdated, self._on_project_updated)
@@ -168,17 +167,17 @@ class QtEventAdapter(QObject):
         self.event_bus.subscribe(EditorStateChanged, self._on_editor_state_changed)
         self.event_bus.subscribe(EditorModifiedChanged, self._on_editor_modified_changed)
         
-        # App events
+        # Application events
         self.event_bus.subscribe(AppStateChanged, self._on_app_state_changed)
         self.event_bus.subscribe(SaveRequested, self._on_save_requested)
         self.event_bus.subscribe(SaveCompleted, self._on_save_completed)
     
     def _process_pending_events(self) -> None:
-        """Process pending events from background threads."""
+        """Process any pending events from background threads."""
         self.event_bus.process_pending()
     
     def stop(self) -> None:
-        """Stop the polling timer."""
+        """Stop the event processing timer."""
         self._timer.stop()
     
     # === Project Event Handlers ===
@@ -291,7 +290,7 @@ class QtEventAdapter(QObject):
             event.editor_type, event.item_id, event.is_modified
         )
     
-    # === App Event Handlers ===
+    # === Application Event Handlers ===
     
     def _on_app_state_changed(self, event: AppStateChanged) -> None:
         self.app_state_changed.emit(
