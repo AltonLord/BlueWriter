@@ -5,7 +5,7 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | Phase 2 - Event System |
-| **Current Task** | Task 2.2 - Implement thread-safe EventBus |
+| **Current Task** | Task 2.4 - Create event logging/debugging utilities |
 | **Status** | IN PROGRESS |
 | **Last Updated** | 2025-12-22 |
 | **Git Branch** | feature/mcp-integration |
@@ -22,8 +22,8 @@
 
 ### Phase 2: Event System
 - [x] Task 2.1: Define all event types
-- [ ] Task 2.2: Implement EventBus with thread-safe queuing
-- [ ] Task 2.3: Add event emission to all services
+- [x] Task 2.2: Implement EventBus with thread-safe queuing
+- [x] Task 2.3: Add event emission to all services
 - [ ] Task 2.4: Create event logging/debugging utilities
 
 ### Phase 3: REST API
@@ -66,6 +66,8 @@
 | 2025-12-22 | Task 1.6 | Created CanvasService (in-memory pan/zoom state) and EditorService (track open/modified editors) |
 | 2025-12-22 | Phase 1 | **COMPLETE** - All 6 services created with events |
 | 2025-12-22 | Task 2.1 | Added 30 event types with to_dict()/to_json() serialization |
+| 2025-12-22 | Task 2.2 | Thread-safe EventBus with queue for cross-thread events |
+| 2025-12-22 | Task 2.3 | Verified all services emit events correctly (27 events from 26 types) |
 
 ## Known Issues / Blockers
 
