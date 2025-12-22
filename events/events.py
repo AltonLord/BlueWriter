@@ -110,6 +110,7 @@ class ChapterCreated(Event):
     title: str
     board_x: float
     board_y: float
+    color: str = "#FFFF88"
 
 
 @dataclass

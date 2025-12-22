@@ -229,6 +229,7 @@ class ChapterService(BaseService):
                 title=dto.title,
                 board_x=dto.board_x,
                 board_y=dto.board_y,
+                color=dto.color,
             ))
             
             return dto

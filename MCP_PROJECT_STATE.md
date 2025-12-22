@@ -4,8 +4,8 @@
 
 | Field | Value |
 |-------|-------|
-| **Current Phase** | Phase 4 - Qt Adapter Integration |
-| **Current Task** | Task 4.1 - Create QtEventAdapter class |
+| **Current Phase** | Phase 5 - MCP Server |
+| **Current Task** | Task 5.1 - Set up MCP server structure |
 | **Status** | NOT STARTED |
 | **Last Updated** | 2025-12-22 |
 | **Git Branch** | feature/mcp-integration |
@@ -34,10 +34,10 @@
 - [x] Task 3.5: Implement canvas and state routes
 
 ### Phase 4: Qt Adapter Integration
-- [ ] Task 4.1: Create QtEventAdapter class
-- [ ] Task 4.2: Integrate adapter with MainWindow
-- [ ] Task 4.3: Refactor views to use services instead of direct DB
-- [ ] Task 4.4: Start API server on application launch
+- [x] Task 4.1: Create QtEventAdapter class
+- [x] Task 4.2: Integrate adapter with MainWindow
+- [x] Task 4.3: Refactor views to use services instead of direct DB
+- [x] Task 4.4: Start API server on application launch
 
 ### Phase 5: MCP Server
 - [ ] Task 5.1: Set up MCP server structure
@@ -71,6 +71,7 @@
 | 2025-12-22 | Task 2.4 | Created EventLogger and EventRecorder debug utilities |
 | 2025-12-22 | Phase 2 | **COMPLETE** - Event system with thread-safe bus and debugging tools |
 | 2025-12-22 | Phase 3 | **COMPLETE** - Full REST API with 52 routes, FastAPI + Pydantic |
+| 2025-12-22 | Phase 4 | **COMPLETE** - QtEventAdapter, ServiceContainer, MainWindow integration |
 
 ## Known Issues / Blockers
 

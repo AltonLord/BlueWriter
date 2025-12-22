@@ -11,6 +11,7 @@ from services.chapter_service import ChapterService, ChapterDTO
 from services.encyclopedia_service import EncyclopediaService, EncyclopediaEntryDTO
 from services.canvas_service import CanvasService, CanvasViewDTO
 from services.editor_service import EditorService, OpenEditorDTO
+from services.container import ServiceContainer
 
 __all__ = [
     'BaseService',
@@ -26,4 +27,5 @@ __all__ = [
     'CanvasViewDTO',
     'EditorService',
     'OpenEditorDTO',
+    'ServiceContainer',
 ]

@@ -24,6 +24,8 @@ from database.schema import create_all_tables
 from models.project import Project
 from models.story import Story
 from models.chapter import Chapter
+from services import ServiceContainer
+from adapters.qt_adapter import QtEventAdapter
 
 
 class MainWindow(QMainWindow):
@@ -40,6 +42,9 @@ class MainWindow(QMainWindow):
         with self.db_manager as conn:
             create_all_tables(conn)
         
+        # Initialize service layer and API
+        self._init_services()
+        
         # Current state
         self.current_project_id = None
         self.current_story_id = None
@@ -55,6 +60,99 @@ class MainWindow(QMainWindow):
         self.status_bar = QStatusBar()
         self.setStatusBar(self.status_bar)
         self.status_bar.showMessage("Ready - Create or open a project to begin")
+
+    def _init_services(self) -> None:
+        """Initialize the service layer, event adapter, and API server."""
+        db_path = str(get_default_db_path())
+        
+        # Create service container with all services
+        self.services = ServiceContainer(db_path)
+        
+        # Create Qt event adapter (bridges events to Qt signals)
+        self.event_adapter = QtEventAdapter(self.services.event_bus, self)
+        
+        # Connect adapter signals to handlers
+        self._connect_event_signals()
+        
+        # Start REST API server in background thread
+        try:
+            self.services.start_api_server(port=5000)
+            print(f"BlueWriter API running on {self.services.get_api_url()}")
+        except Exception as e:
+            print(f"Warning: Could not start API server: {e}")
+    
+    def _connect_event_signals(self) -> None:
+        """Connect Qt event adapter signals to UI update handlers."""
+        # These handlers update the UI when services emit events
+        # (e.g., when MCP/API creates a chapter, the UI updates)
+        
+        # Chapter events - update canvas when chapters change
+        self.event_adapter.chapter_created.connect(self._on_service_chapter_created)
+        self.event_adapter.chapter_deleted.connect(self._on_service_chapter_deleted)
+        self.event_adapter.chapter_moved.connect(self._on_service_chapter_moved)
+        self.event_adapter.chapter_color_changed.connect(self._on_service_chapter_color_changed)
+        
+        # Story events - update sidebar when stories change
+        self.event_adapter.story_selected.connect(self._on_service_story_selected)
+    
+    def _on_service_chapter_created(
+        self, chapter_id: int, story_id: int, title: str, 
+        board_x: int, board_y: int, color: str
+    ) -> None:
+        """Handle chapter created by service (e.g., from API/MCP)."""
+        if story_id == self.current_story_id:
+            # Reload the chapter from DB and add to canvas
+            with self.db_manager as conn:
+                chapter = Chapter.get_by_id(conn, chapter_id)
+                if chapter:
+                    self.add_sticky_note(chapter)
+    
+    def _on_service_chapter_deleted(self, chapter_id: int, story_id: int) -> None:
+        """Handle chapter deleted by service."""
+        if story_id == self.current_story_id:
+            # Find and remove the sticky note
+            for note in self.sticky_notes[:]:
+                if note.chapter.id == chapter_id:
+                    note.setParent(None)
+                    note.deleteLater()
+                    self.sticky_notes.remove(note)
+                    break
+            # Close editor if open
+            if chapter_id in self.open_editors:
+                self.open_editors[chapter_id].close()
+    
+    def _on_service_chapter_moved(
+        self, chapter_id: int, old_x: int, old_y: int, 
+        new_x: int, new_y: int
+    ) -> None:
+        """Handle chapter moved by service."""
+        for note in self.sticky_notes:
+            if note.chapter.id == chapter_id:
+                # Update the note's position
+                note.chapter.board_x = new_x
+                note.chapter.board_y = new_y
+                screen_x, screen_y = self.canvas.canvas_to_screen(new_x, new_y)
+                note.move(int(screen_x), int(screen_y))
+                break
+    
+    def _on_service_chapter_color_changed(
+        self, chapter_id: int, old_color: str, new_color: str
+    ) -> None:
+        """Handle chapter color changed by service."""
+        for note in self.sticky_notes:
+            if note.chapter.id == chapter_id:
+                note.chapter.color = new_color
+                note.update_color()
+                break
+    
+    def _on_service_story_selected(self, story_id: int) -> None:
+        """Handle story selected by service."""
+        if story_id != self.current_story_id:
+            # Load the story - this will update the canvas
+            with self.db_manager as conn:
+                story = Story.get_by_id(conn, story_id)
+                if story:
+                    self.load_story(story)
 
     def setup_ui(self) -> None:
         """Set up the main UI layout with sidebar and canvas."""
@@ -556,3 +654,16 @@ class MainWindow(QMainWindow):
             "Organize your story using draggable sticky notes\n"
             "on a visual timeline."
         )
+    
+    def closeEvent(self, event) -> None:
+        """Handle application close - clean up resources."""
+        # Stop the event adapter timer
+        if hasattr(self, 'event_adapter'):
+            self.event_adapter.stop()
+        
+        # Close all open editors
+        for editor in list(self.open_editors.values()):
+            editor.close()
+        
+        # Accept the close event
+        event.accept()
