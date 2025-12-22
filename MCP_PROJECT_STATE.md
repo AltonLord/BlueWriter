@@ -5,8 +5,8 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | Phase 2 - Event System |
-| **Current Task** | Task 2.1 - Define all event types |
-| **Status** | NOT STARTED |
+| **Current Task** | Task 2.2 - Implement thread-safe EventBus |
+| **Status** | IN PROGRESS |
 | **Last Updated** | 2025-12-22 |
 | **Git Branch** | feature/mcp-integration |
 
@@ -21,7 +21,7 @@
 - [x] Task 1.6: Create CanvasService and EditorService
 
 ### Phase 2: Event System
-- [ ] Task 2.1: Define all event types
+- [x] Task 2.1: Define all event types
 - [ ] Task 2.2: Implement EventBus with thread-safe queuing
 - [ ] Task 2.3: Add event emission to all services
 - [ ] Task 2.4: Create event logging/debugging utilities
@@ -65,6 +65,7 @@
 | 2025-12-22 | Task 1.5 | Created EncyclopediaService with CRUD, category filtering, search, open/close events |
 | 2025-12-22 | Task 1.6 | Created CanvasService (in-memory pan/zoom state) and EditorService (track open/modified editors) |
 | 2025-12-22 | Phase 1 | **COMPLETE** - All 6 services created with events |
+| 2025-12-22 | Task 2.1 | Added 30 event types with to_dict()/to_json() serialization |
 
 ## Known Issues / Blockers
 

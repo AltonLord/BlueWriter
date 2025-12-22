@@ -237,6 +237,31 @@ class EditorModifiedChanged(Event):
     is_modified: bool
 
 
+# =============================================================================
+# Application Events
+# =============================================================================
+
+@dataclass
+class AppStateChanged(Event):
+    """Emitted when application state changes (project/story selection)."""
+    current_project_id: Optional[int]
+    current_story_id: Optional[int]
+
+
+@dataclass
+class SaveRequested(Event):
+    """Emitted when a save operation is requested."""
+    save_all: bool = False  # If True, save all modified editors
+
+
+@dataclass
+class SaveCompleted(Event):
+    """Emitted when a save operation completes."""
+    items_saved: int
+    success: bool
+    error_message: Optional[str] = None
+
+
 __all__ = [
     # Project events
     'ProjectCreated',
@@ -271,4 +296,8 @@ __all__ = [
     # Editor events
     'EditorStateChanged',
     'EditorModifiedChanged',
+    # Application events
+    'AppStateChanged',
+    'SaveRequested',
+    'SaveCompleted',
 ]
