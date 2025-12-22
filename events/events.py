@@ -7,7 +7,7 @@ that inherit from Event and include relevant data for subscribers.
 Events are organized by domain:
 - Project events
 - Story events
-- Chapter events (Task 1.4)
+- Chapter events
 - Encyclopedia events (Task 1.5)
 - Canvas/Editor events (Task 1.6)
 """
@@ -98,6 +98,64 @@ class StoriesReordered(Event):
     story_ids: List[int]  # New order
 
 
+# =============================================================================
+# Chapter Events
+# =============================================================================
+
+@dataclass
+class ChapterCreated(Event):
+    """Emitted when a new chapter is created."""
+    chapter_id: int
+    story_id: int
+    title: str
+    board_x: float
+    board_y: float
+
+
+@dataclass
+class ChapterUpdated(Event):
+    """Emitted when a chapter is modified."""
+    chapter_id: int
+    fields_changed: List[str]
+
+
+@dataclass
+class ChapterDeleted(Event):
+    """Emitted when a chapter is deleted."""
+    chapter_id: int
+    story_id: int
+
+
+@dataclass
+class ChapterMoved(Event):
+    """Emitted when a chapter's sticky note is moved on the canvas."""
+    chapter_id: int
+    old_x: float
+    old_y: float
+    new_x: float
+    new_y: float
+
+
+@dataclass
+class ChapterColorChanged(Event):
+    """Emitted when a chapter's sticky note color changes."""
+    chapter_id: int
+    old_color: str
+    new_color: str
+
+
+@dataclass
+class ChapterOpened(Event):
+    """Emitted when a chapter is opened in the editor."""
+    chapter_id: int
+
+
+@dataclass
+class ChapterClosed(Event):
+    """Emitted when a chapter editor is closed."""
+    chapter_id: int
+
+
 __all__ = [
     # Project events
     'ProjectCreated',
@@ -112,4 +170,12 @@ __all__ = [
     'StoryPublished',
     'StoryUnpublished',
     'StoriesReordered',
+    # Chapter events
+    'ChapterCreated',
+    'ChapterUpdated',
+    'ChapterDeleted',
+    'ChapterMoved',
+    'ChapterColorChanged',
+    'ChapterOpened',
+    'ChapterClosed',
 ]

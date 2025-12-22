@@ -49,6 +49,14 @@ from events.events import (
     StoryPublished,
     StoryUnpublished,
     StoriesReordered,
+    # Chapter events
+    ChapterCreated,
+    ChapterUpdated,
+    ChapterDeleted,
+    ChapterMoved,
+    ChapterColorChanged,
+    ChapterOpened,
+    ChapterClosed,
 )
 
 __all__ = [
@@ -66,4 +74,12 @@ __all__ = [
     'StoryPublished',
     'StoryUnpublished',
     'StoriesReordered',
+    # Chapter events
+    'ChapterCreated',
+    'ChapterUpdated',
+    'ChapterDeleted',
+    'ChapterMoved',
+    'ChapterColorChanged',
+    'ChapterOpened',
+    'ChapterClosed',
 ]
