@@ -5,15 +5,15 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | Phase 1 - Extract Service Layer |
-| **Current Task** | Task 1.1 - Create Service Base Class |
-| **Status** | NOT STARTED |
-| **Last Updated** | 2024-12-22 |
-| **Git Branch** | main (create feature/mcp-integration when starting) |
+| **Current Task** | Task 1.2 - Create ProjectService |
+| **Status** | IN PROGRESS |
+| **Last Updated** | 2025-12-22 |
+| **Git Branch** | feature/mcp-integration |
 
 ## Phase Progress
 
 ### Phase 1: Extract Service Layer
-- [ ] Task 1.1: Create service base class and event bus foundation
+- [x] Task 1.1: Create service base class and event bus foundation
 - [ ] Task 1.2: Create ProjectService
 - [ ] Task 1.3: Create StoryService  
 - [ ] Task 1.4: Create ChapterService
@@ -58,6 +58,7 @@
 | Date | Task | Notes |
 |------|------|-------|
 | 2024-12-22 | Project Setup | Created project plan, overview, standards, prompts |
+| 2025-12-22 | Task 1.1 | Created services/base.py, events/__init__.py, events/event_bus.py |
 
 ## Known Issues / Blockers
 
