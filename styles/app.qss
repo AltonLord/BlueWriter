@@ -1,0 +1,296 @@
+/*
+ * BlueWriter Application Style Sheet
+ * Qt Style Sheets for consistent UI appearance
+ */
+
+/* Main application background */
+QWidget {
+    background-color: #f5f5f5;
+    color: #333333;
+    font-family: "Segoe UI", "Arial", sans-serif;
+    font-size: 10pt;
+}
+
+/* Main window styling */
+QMainWindow {
+    background-color: #f0f0f0;
+}
+
+/* Menu bar styling */
+QMenuBar {
+    background-color: #e0e0e0;
+    border-bottom: 1px solid #cccccc;
+}
+
+QMenuBar::item {
+    background-color: transparent;
+    padding: 6px 12px;
+    border-radius: 3px;
+}
+
+QMenuBar::item:selected {
+    background-color: #d0d0d0;
+}
+
+QMenuBar::item:pressed {
+    background-color: #c0c0c0;
+}
+
+/* Toolbar styling */
+QToolBar {
+    background-color: #e8e8e8;
+    border-bottom: 1px solid #cccccc;
+    spacing: 5px;
+    padding: 3px;
+}
+
+QToolBar::handle {
+    width: 20px;
+    background-color: #d0d0d0;
+}
+
+/* Button styling */
+QPushButton {
+    background-color: #f0f0f0;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-weight: normal;
+    min-width: 80px;
+}
+
+QPushButton:hover {
+    background-color: #e0e0e0;
+    border: 1px solid #aaaaaa;
+}
+
+QPushButton:pressed {
+    background-color: #d0d0d0;
+    border: 1px solid #999999;
+}
+
+QPushButton:checked {
+    background-color: #d0d0d0;
+    border: 1px solid #999999;
+}
+
+/* Dialog styling */
+QDialog {
+    background-color: #f5f5f5;
+}
+
+QDialog QGroupBox {
+    margin-top: 10px;
+    padding-top: 10px;
+    font-weight: bold;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    margin-bottom: 5px;
+}
+
+/* Text edit styling */
+QTextEdit {
+    background-color: white;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    padding: 8px;
+    font-family: "Segoe UI", "Arial", sans-serif;
+    font-size: 10pt;
+}
+
+/* Line edit styling */
+QLineEdit {
+    background-color: white;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    padding: 6px;
+    font-family: "Segoe UI", "Arial", sans-serif;
+    font-size: 10pt;
+}
+
+/* Combo box styling */
+QComboBox {
+    background-color: white;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    padding: 6px;
+    font-family: "Segoe UI", "Arial", sans-serif;
+    font-size: 10pt;
+    min-width: 120px;
+}
+
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 20px;
+    border-left: 1px solid #cccccc;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+
+/* Scroll bar styling */
+QScrollBar:vertical {
+    background-color: #f0f0f0;
+    width: 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+}
+
+QScrollBar::handle:vertical {
+    background-color: #c0c0c0;
+    border-radius: 4px;
+    min-height: 20px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background-color: #b0b0b0;
+}
+
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    height: 0;
+    subline-position: left;
+    subline-align: left;
+}
+
+/* Status bar styling */
+QStatusBar {
+    background-color: #e8e8e8;
+    border-top: 1px solid #cccccc;
+    padding: 3px;
+    font-size: 9pt;
+}
+
+/* Auto-save status indicator */
+#format_toolbar {
+    background-color: #e8e8e8;
+    border-bottom: 1px solid #cccccc;
+}
+
+#format_toolbar QLabel {
+    font-size: 9pt;
+    margin: 0px;
+    padding: 2px;
+}
+
+/* Chapter editor specific styling */
+QDialog#ChapterEditor {
+    background-color: #f5f5f5;
+}
+
+QDialog#ChapterEditor QGroupBox {
+    margin-top: 10px;
+    padding-top: 10px;
+    font-weight: bold;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    margin-bottom: 5px;
+}
+
+/* Formatting toolbar specific styling */
+QToolBar#format_toolbar QToolButton {
+    background-color: transparent;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    padding: 4px;
+    margin: 0px;
+}
+
+QToolBar#format_toolbar QToolButton:hover {
+    background-color: #d0d0d0;
+    border: 1px solid #aaaaaa;
+}
+
+QToolBar#format_toolbar QToolButton:checked {
+    background-color: #c0c0c0;
+    border: 1px solid #999999;
+}
+
+/* Formatting toolbar combo box styling */
+QToolBar#format_toolbar QComboBox {
+    background-color: white;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    padding: 2px;
+    font-family: "Segoe UI", "Arial", sans-serif;
+    font-size: 9pt;
+    min-width: 60px;
+}
+
+QToolBar#format_toolbar QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 15px;
+    border-left: 1px solid #cccccc;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+
+/* Font sizes for toolbar */
+QToolBar#format_toolbar QComboBox::item {
+    padding: 2px;
+    font-size: 9pt;
+}
+
+/* Table styling (for potential future use) */
+QTableWidget {
+    background-color: white;
+    gridline-color: #e0e0e0;
+    alternate-background-color: #f8f8f8;
+    border: 1px solid #cccccc;
+}
+
+QHeaderView::section {
+    background-color: #e8e8e8;
+    padding: 4px;
+    border: 1px solid #cccccc;
+    font-weight: bold;
+}
+
+/* Scroll area styling */
+QScrollArea {
+    background-color: transparent;
+    border: none;
+}
+
+/* Group box styling */
+QGroupBox {
+    margin-top: 10px;
+    padding-top: 10px;
+    font-weight: bold;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    margin-bottom: 5px;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    left: 10px;
+    padding: 0 3px 0 3px;
+}
+
+/* Progress bar styling */
+QProgressBar {
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    text-align: center;
+    font-size: 8pt;
+}
+
+QProgressBar::chunk {
+    background-color: #4CAF50;
+    border-radius: 3px;
+}
+
+/* Status bar label styling */
+QStatusBar QLabel {
+    margin: 2px;
+    padding: 2px;
+}
+
+/* Status bar indicator dot styling */
+QStatusBar QLabel#indicator_dot {
+    font-weight: bold;
+    margin: 0px;
+    padding: 0px;
+    min-width: 10px;
+}
