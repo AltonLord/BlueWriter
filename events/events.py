@@ -195,6 +195,48 @@ class EntryClosed(Event):
     entry_id: int
 
 
+# =============================================================================
+# Canvas Events
+# =============================================================================
+
+@dataclass
+class CanvasPanned(Event):
+    """Emitted when the canvas is panned."""
+    story_id: int
+    old_x: float
+    old_y: float
+    new_x: float
+    new_y: float
+
+
+@dataclass
+class CanvasZoomed(Event):
+    """Emitted when the canvas zoom level changes."""
+    story_id: int
+    old_zoom: float
+    new_zoom: float
+
+
+# =============================================================================
+# Editor Events
+# =============================================================================
+
+@dataclass
+class EditorStateChanged(Event):
+    """Emitted when an editor's open/close state changes."""
+    editor_type: str  # "chapter" or "encyclopedia"
+    item_id: int
+    is_open: bool
+
+
+@dataclass
+class EditorModifiedChanged(Event):
+    """Emitted when an editor's modified (dirty) state changes."""
+    editor_type: str
+    item_id: int
+    is_modified: bool
+
+
 __all__ = [
     # Project events
     'ProjectCreated',
@@ -223,4 +265,10 @@ __all__ = [
     'EntryDeleted',
     'EntryOpened',
     'EntryClosed',
+    # Canvas events
+    'CanvasPanned',
+    'CanvasZoomed',
+    # Editor events
+    'EditorStateChanged',
+    'EditorModifiedChanged',
 ]

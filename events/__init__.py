@@ -18,13 +18,6 @@ class Event:
     Note: Due to dataclass inheritance rules, we use
     field(default=None, init=False) for timestamp so that
     child classes can have required fields.
-    
-    Example:
-        @dataclass
-        class ChapterCreated(Event):
-            chapter_id: int
-            story_id: int
-            title: str
     """
     timestamp: datetime = field(default=None, init=False)
     
@@ -63,6 +56,12 @@ from events.events import (
     EntryDeleted,
     EntryOpened,
     EntryClosed,
+    # Canvas events
+    CanvasPanned,
+    CanvasZoomed,
+    # Editor events
+    EditorStateChanged,
+    EditorModifiedChanged,
 )
 
 __all__ = [
@@ -94,4 +93,10 @@ __all__ = [
     'EntryDeleted',
     'EntryOpened',
     'EntryClosed',
+    # Canvas events
+    'CanvasPanned',
+    'CanvasZoomed',
+    # Editor events
+    'EditorStateChanged',
+    'EditorModifiedChanged',
 ]

@@ -4,9 +4,9 @@
 
 | Field | Value |
 |-------|-------|
-| **Current Phase** | Phase 1 - Extract Service Layer |
-| **Current Task** | Task 1.6 - Create CanvasService and EditorService |
-| **Status** | IN PROGRESS |
+| **Current Phase** | Phase 2 - Event System |
+| **Current Task** | Task 2.1 - Define all event types |
+| **Status** | NOT STARTED |
 | **Last Updated** | 2025-12-22 |
 | **Git Branch** | feature/mcp-integration |
 
@@ -18,7 +18,7 @@
 - [x] Task 1.3: Create StoryService  
 - [x] Task 1.4: Create ChapterService
 - [x] Task 1.5: Create EncyclopediaService
-- [ ] Task 1.6: Create CanvasService and EditorService
+- [x] Task 1.6: Create CanvasService and EditorService
 
 ### Phase 2: Event System
 - [ ] Task 2.1: Define all event types
@@ -63,6 +63,8 @@
 | 2025-12-22 | Task 1.3 | Created StoryService with CRUD + publish/unpublish + reorder, StoryDTO, story events |
 | 2025-12-22 | Task 1.4 | Created ChapterService with CRUD, move, color, content helpers, locked story protection |
 | 2025-12-22 | Task 1.5 | Created EncyclopediaService with CRUD, category filtering, search, open/close events |
+| 2025-12-22 | Task 1.6 | Created CanvasService (in-memory pan/zoom state) and EditorService (track open/modified editors) |
+| 2025-12-22 | Phase 1 | **COMPLETE** - All 6 services created with events |
 
 ## Known Issues / Blockers
 

@@ -9,6 +9,8 @@ from services.project_service import ProjectService, ProjectDTO
 from services.story_service import StoryService, StoryDTO
 from services.chapter_service import ChapterService, ChapterDTO
 from services.encyclopedia_service import EncyclopediaService, EncyclopediaEntryDTO
+from services.canvas_service import CanvasService, CanvasViewDTO
+from services.editor_service import EditorService, OpenEditorDTO
 
 __all__ = [
     'BaseService',
@@ -20,4 +22,8 @@ __all__ = [
     'ChapterDTO',
     'EncyclopediaService',
     'EncyclopediaEntryDTO',
+    'CanvasService',
+    'CanvasViewDTO',
+    'EditorService',
+    'OpenEditorDTO',
 ]
