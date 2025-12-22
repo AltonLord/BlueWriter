@@ -5,7 +5,7 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | Phase 1 - Extract Service Layer |
-| **Current Task** | Task 1.3 - Create StoryService |
+| **Current Task** | Task 1.4 - Create ChapterService |
 | **Status** | IN PROGRESS |
 | **Last Updated** | 2025-12-22 |
 | **Git Branch** | feature/mcp-integration |
@@ -15,7 +15,7 @@
 ### Phase 1: Extract Service Layer
 - [x] Task 1.1: Create service base class and event bus foundation
 - [x] Task 1.2: Create ProjectService
-- [ ] Task 1.3: Create StoryService  
+- [x] Task 1.3: Create StoryService  
 - [ ] Task 1.4: Create ChapterService
 - [ ] Task 1.5: Create EncyclopediaService
 - [ ] Task 1.6: Create CanvasService and EditorService
@@ -60,6 +60,7 @@
 | 2024-12-22 | Project Setup | Created project plan, overview, standards, prompts |
 | 2025-12-22 | Task 1.1 | Created services/base.py, events/__init__.py, events/event_bus.py |
 | 2025-12-22 | Task 1.2 | Created ProjectService with CRUD + events, ProjectDTO, project events |
+| 2025-12-22 | Task 1.3 | Created StoryService with CRUD + publish/unpublish + reorder, StoryDTO, story events |
 
 ## Known Issues / Blockers
 

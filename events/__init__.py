@@ -13,15 +13,11 @@ class Event:
     """Base class for all events.
     
     All events automatically get a timestamp when created.
-    Subclasses should add their specific data fields BEFORE
-    inheriting, since timestamp has a default value.
+    Subclasses should add their specific data fields.
     
-    Note: Due to dataclass inheritance rules, child classes
-    must either:
-    - Define their fields before the parent's default fields
-    - Or give all their fields default values
-    
-    We solve this by setting timestamp in __post_init__.
+    Note: Due to dataclass inheritance rules, we use
+    field(default=None, init=False) for timestamp so that
+    child classes can have required fields.
     
     Example:
         @dataclass
@@ -30,7 +26,6 @@ class Event:
             story_id: int
             title: str
     """
-    # Using field with init=False so subclasses can have required fields
     timestamp: datetime = field(default=None, init=False)
     
     def __post_init__(self):
@@ -41,16 +36,34 @@ class Event:
 
 # Re-export event types for convenience
 from events.events import (
+    # Project events
     ProjectCreated,
     ProjectUpdated,
     ProjectDeleted,
     ProjectOpened,
+    # Story events
+    StoryCreated,
+    StoryUpdated,
+    StoryDeleted,
+    StorySelected,
+    StoryPublished,
+    StoryUnpublished,
+    StoriesReordered,
 )
 
 __all__ = [
     'Event',
+    # Project events
     'ProjectCreated',
     'ProjectUpdated',
     'ProjectDeleted',
     'ProjectOpened',
+    # Story events
+    'StoryCreated',
+    'StoryUpdated',
+    'StoryDeleted',
+    'StorySelected',
+    'StoryPublished',
+    'StoryUnpublished',
+    'StoriesReordered',
 ]
