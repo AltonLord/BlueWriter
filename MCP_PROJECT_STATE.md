@@ -4,8 +4,8 @@
 
 | Field | Value |
 |-------|-------|
-| **Current Phase** | Phase 3 - REST API |
-| **Current Task** | Task 3.1 - Set up FastAPI application structure |
+| **Current Phase** | Phase 4 - Qt Adapter Integration |
+| **Current Task** | Task 4.1 - Create QtEventAdapter class |
 | **Status** | NOT STARTED |
 | **Last Updated** | 2025-12-22 |
 | **Git Branch** | feature/mcp-integration |
@@ -27,11 +27,11 @@
 - [x] Task 2.4: Create event logging/debugging utilities
 
 ### Phase 3: REST API
-- [ ] Task 3.1: Set up FastAPI application structure
-- [ ] Task 3.2: Create Pydantic schemas
-- [ ] Task 3.3: Implement project and story routes
-- [ ] Task 3.4: Implement chapter and encyclopedia routes
-- [ ] Task 3.5: Implement canvas and state routes
+- [x] Task 3.1: Set up FastAPI application structure
+- [x] Task 3.2: Create Pydantic schemas
+- [x] Task 3.3: Implement project and story routes
+- [x] Task 3.4: Implement chapter and encyclopedia routes
+- [x] Task 3.5: Implement canvas and state routes
 
 ### Phase 4: Qt Adapter Integration
 - [ ] Task 4.1: Create QtEventAdapter class
@@ -70,6 +70,7 @@
 | 2025-12-22 | Task 2.3 | Verified all services emit events correctly (27 events from 26 types) |
 | 2025-12-22 | Task 2.4 | Created EventLogger and EventRecorder debug utilities |
 | 2025-12-22 | Phase 2 | **COMPLETE** - Event system with thread-safe bus and debugging tools |
+| 2025-12-22 | Phase 3 | **COMPLETE** - Full REST API with 52 routes, FastAPI + Pydantic |
 
 ## Known Issues / Blockers
 
