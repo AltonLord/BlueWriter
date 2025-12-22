@@ -156,6 +156,45 @@ class ChapterClosed(Event):
     chapter_id: int
 
 
+# =============================================================================
+# Encyclopedia Events
+# =============================================================================
+
+@dataclass
+class EntryCreated(Event):
+    """Emitted when a new encyclopedia entry is created."""
+    entry_id: int
+    project_id: int
+    name: str
+    category: str
+
+
+@dataclass
+class EntryUpdated(Event):
+    """Emitted when an encyclopedia entry is modified."""
+    entry_id: int
+    fields_changed: List[str]
+
+
+@dataclass
+class EntryDeleted(Event):
+    """Emitted when an encyclopedia entry is deleted."""
+    entry_id: int
+    project_id: int
+
+
+@dataclass
+class EntryOpened(Event):
+    """Emitted when an encyclopedia entry is opened in the editor."""
+    entry_id: int
+
+
+@dataclass
+class EntryClosed(Event):
+    """Emitted when an encyclopedia entry editor is closed."""
+    entry_id: int
+
+
 __all__ = [
     # Project events
     'ProjectCreated',
@@ -178,4 +217,10 @@ __all__ = [
     'ChapterColorChanged',
     'ChapterOpened',
     'ChapterClosed',
+    # Encyclopedia events
+    'EntryCreated',
+    'EntryUpdated',
+    'EntryDeleted',
+    'EntryOpened',
+    'EntryClosed',
 ]

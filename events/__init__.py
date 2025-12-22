@@ -57,6 +57,12 @@ from events.events import (
     ChapterColorChanged,
     ChapterOpened,
     ChapterClosed,
+    # Encyclopedia events
+    EntryCreated,
+    EntryUpdated,
+    EntryDeleted,
+    EntryOpened,
+    EntryClosed,
 )
 
 __all__ = [
@@ -82,4 +88,10 @@ __all__ = [
     'ChapterColorChanged',
     'ChapterOpened',
     'ChapterClosed',
+    # Encyclopedia events
+    'EntryCreated',
+    'EntryUpdated',
+    'EntryDeleted',
+    'EntryOpened',
+    'EntryClosed',
 ]

@@ -5,7 +5,7 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | Phase 1 - Extract Service Layer |
-| **Current Task** | Task 1.5 - Create EncyclopediaService |
+| **Current Task** | Task 1.6 - Create CanvasService and EditorService |
 | **Status** | IN PROGRESS |
 | **Last Updated** | 2025-12-22 |
 | **Git Branch** | feature/mcp-integration |
@@ -17,7 +17,7 @@
 - [x] Task 1.2: Create ProjectService
 - [x] Task 1.3: Create StoryService  
 - [x] Task 1.4: Create ChapterService
-- [ ] Task 1.5: Create EncyclopediaService
+- [x] Task 1.5: Create EncyclopediaService
 - [ ] Task 1.6: Create CanvasService and EditorService
 
 ### Phase 2: Event System
@@ -62,6 +62,7 @@
 | 2025-12-22 | Task 1.2 | Created ProjectService with CRUD + events, ProjectDTO, project events |
 | 2025-12-22 | Task 1.3 | Created StoryService with CRUD + publish/unpublish + reorder, StoryDTO, story events |
 | 2025-12-22 | Task 1.4 | Created ChapterService with CRUD, move, color, content helpers, locked story protection |
+| 2025-12-22 | Task 1.5 | Created EncyclopediaService with CRUD, category filtering, search, open/close events |
 
 ## Known Issues / Blockers
 
