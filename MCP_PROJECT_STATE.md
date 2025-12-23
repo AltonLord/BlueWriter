@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Current Phase** | Phase 5 - MCP Server |
-| **Current Task** | Task 5.1 - Set up MCP server structure |
+| **Current Phase** | Phase 6 - Testing & Documentation |
+| **Current Task** | Task 6.1 - Integration tests for services |
 | **Status** | NOT STARTED |
-| **Last Updated** | 2025-12-22 |
+| **Last Updated** | 2025-12-23 |
 | **Git Branch** | feature/mcp-integration |
 
 ## Phase Progress
@@ -40,12 +40,12 @@
 - [x] Task 4.4: Start API server on application launch
 
 ### Phase 5: MCP Server
-- [ ] Task 5.1: Set up MCP server structure
-- [ ] Task 5.2: Implement project and story tools
-- [ ] Task 5.3: Implement chapter tools
-- [ ] Task 5.4: Implement chapter content/formatting tools
-- [ ] Task 5.5: Implement encyclopedia tools
-- [ ] Task 5.6: Implement canvas and UI state tools
+- [x] Task 5.1: Set up MCP server structure
+- [x] Task 5.2: Implement project and story tools
+- [x] Task 5.3: Implement chapter tools
+- [x] Task 5.4: Implement chapter content/formatting tools
+- [x] Task 5.5: Implement encyclopedia tools
+- [x] Task 5.6: Implement canvas and UI state tools
 
 ### Phase 6: Testing & Documentation
 - [ ] Task 6.1: Integration tests for services
@@ -72,6 +72,7 @@
 | 2025-12-22 | Phase 2 | **COMPLETE** - Event system with thread-safe bus and debugging tools |
 | 2025-12-22 | Phase 3 | **COMPLETE** - Full REST API with 52 routes, FastAPI + Pydantic |
 | 2025-12-22 | Phase 4 | **COMPLETE** - QtEventAdapter, ServiceContainer, MainWindow integration |
+| 2025-12-23 | Phase 5 | **COMPLETE** - MCP server with 46 tools (bluewriter_mcp package) |
 
 ## Known Issues / Blockers
 
