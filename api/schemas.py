@@ -97,8 +97,8 @@ class ChapterBase(BaseModel):
 
 class ChapterCreate(ChapterBase):
     """Schema for creating a new chapter."""
-    board_x: int = Field(100, ge=0, description="X position on canvas")
-    board_y: int = Field(100, ge=0, description="Y position on canvas")
+    board_x: int = Field(100, description="X position on canvas")
+    board_y: int = Field(100, description="Y position on canvas")
     color: str = Field("#FFFF88", pattern=r"^#[0-9A-Fa-f]{6}$", description="Sticky note color")
 
 
@@ -132,8 +132,8 @@ class ChapterContentUpdate(BaseModel):
 
 class ChapterPositionUpdate(BaseModel):
     """Schema for moving a chapter on canvas."""
-    board_x: int = Field(..., ge=0, description="New X position")
-    board_y: int = Field(..., ge=0, description="New Y position")
+    board_x: int = Field(..., description="New X position")
+    board_y: int = Field(..., description="New Y position")
 
 
 class ChapterColorUpdate(BaseModel):
