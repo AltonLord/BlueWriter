@@ -72,7 +72,10 @@ class StoryResponse(StoryBase):
     updated_at: Optional[datetime] = None
     is_locked: bool = False
     is_published: bool = False
-    
+    representation_type: str = "box"
+    bounding_data: Optional[str] = None
+    outline_color: str = "#4A90D9"
+
     model_config = {"from_attributes": True}
 
 
@@ -86,6 +89,13 @@ class StoryReorderRequest(BaseModel):
     story_ids: List[int] = Field(..., description="Story IDs in desired order")
 
 
+class StoryOutlineUpdate(BaseModel):
+    """Schema for updating a story's visual outline data."""
+    representation_type: Optional[str] = Field(None, pattern=r"^(box|string)$", description="'box' or 'string'")
+    bounding_data: Optional[str] = Field(None, description="JSON bounding data")
+    outline_color: Optional[str] = Field(None, pattern=r"^#[0-9A-Fa-f]{6}$", description="Hex outline color")
+
+
 # =============================================================================
 # Chapter Schemas
 # =============================================================================
@@ -97,6 +107,7 @@ class ChapterBase(BaseModel):
 
 class ChapterCreate(ChapterBase):
     """Schema for creating a new chapter."""
+    story_id: Optional[int] = Field(None, description="Story ID (optional, for orphan chapters)")
     board_x: int = Field(100, description="X position on canvas")
     board_y: int = Field(100, description="Y position on canvas")
     color: str = Field("#FFFF88", pattern=r"^#[0-9A-Fa-f]{6}$", description="Sticky note color")
@@ -112,7 +123,8 @@ class ChapterUpdate(BaseModel):
 class ChapterResponse(ChapterBase):
     """Schema for chapter response."""
     id: int
-    story_id: int
+    story_id: Optional[int] = None
+    project_id: Optional[int] = None
     summary: Optional[str] = None
     content: Optional[str] = None
     board_x: int
@@ -120,7 +132,7 @@ class ChapterResponse(ChapterBase):
     color: str
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
-    
+
     model_config = {"from_attributes": True}
 
 
@@ -267,8 +279,8 @@ __all__ = [
     # Project
     'ProjectCreate', 'ProjectUpdate', 'ProjectResponse',
     # Story
-    'StoryCreate', 'StoryUpdate', 'StoryResponse', 
-    'StoryPublishRequest', 'StoryReorderRequest',
+    'StoryCreate', 'StoryUpdate', 'StoryResponse',
+    'StoryPublishRequest', 'StoryReorderRequest', 'StoryOutlineUpdate',
     # Chapter
     'ChapterCreate', 'ChapterUpdate', 'ChapterResponse',
     'ChapterContentUpdate', 'ChapterPositionUpdate', 

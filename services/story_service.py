@@ -18,6 +18,7 @@ from events.events import (
     StoryPublished,
     StoryUnpublished,
     StoriesReordered,
+    StoryOutlineUpdated,
 )
 from models.story import Story, STATUS_DRAFT, STATUS_ROUGH_PUBLISHED, STATUS_FINAL_PUBLISHED
 
@@ -38,7 +39,10 @@ class StoryDTO:
     published_at: Optional[datetime]
     created_at: Optional[datetime]
     updated_at: Optional[datetime]
-    
+    representation_type: str = "box"
+    bounding_data: Optional[str] = None
+    outline_color: str = "#4A90D9"
+
     @property
     def is_locked(self) -> bool:
         """Check if story is locked (final published)."""
@@ -100,6 +104,9 @@ class StoryService(BaseService):
             published_at=story.published_at,
             created_at=story.created_at,
             updated_at=story.updated_at,
+            representation_type=story.representation_type,
+            bounding_data=story.bounding_data,
+            outline_color=story.outline_color,
         )
     
     def list_stories(self, project_id: int) -> List[StoryDTO]:
@@ -241,9 +248,9 @@ class StoryService(BaseService):
     
     def delete_story(self, story_id: int) -> None:
         """Delete a story.
-        
-        This will also delete all chapters in the story
-        due to foreign key cascades.
+
+        Chapters are kept on the canvas as orphans (story_id set to NULL
+        by the ON DELETE SET NULL foreign key constraint).
         Cannot delete final_published stories.
         
         Args:
@@ -420,3 +427,75 @@ class StoryService(BaseService):
             ))
         finally:
             conn.close()
+
+    def update_story_outline(
+        self,
+        story_id: int,
+        representation_type: Optional[str] = None,
+        bounding_data: Optional[str] = None,
+        outline_color: Optional[str] = None,
+    ) -> StoryDTO:
+        """Update the visual outline data for a story.
+
+        Args:
+            story_id: The story's database ID
+            representation_type: "box" or "string" (optional)
+            bounding_data: JSON string with outline data (optional)
+            outline_color: Hex color string (optional)
+
+        Returns:
+            StoryDTO with the updated story data
+
+        Raises:
+            ValueError: If story not found or invalid representation_type
+        """
+        if representation_type is not None and representation_type not in ("box", "string"):
+            raise ValueError(f"Invalid representation_type: {representation_type}. Must be 'box' or 'string'.")
+
+        conn = self._get_connection()
+        try:
+            story = Story.get_by_id(conn, story_id)
+            if story is None:
+                raise ValueError(f"Story {story_id} not found")
+
+            fields_changed = []
+
+            if representation_type is not None:
+                story.representation_type = representation_type
+                fields_changed.append("representation_type")
+
+            if bounding_data is not None:
+                story.bounding_data = bounding_data
+                fields_changed.append("bounding_data")
+
+            if outline_color is not None:
+                story.outline_color = outline_color
+                fields_changed.append("outline_color")
+
+            if fields_changed:
+                # Outline updates bypass the is_locked check via direct SQL
+                cursor = conn.cursor()
+                cursor.execute(
+                    """UPDATE stories SET representation_type = ?, bounding_data = ?,
+                       outline_color = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?""",
+                    (story.representation_type, story.bounding_data, story.outline_color, story.id)
+                )
+                conn.commit()
+
+                self.event_bus.publish(StoryOutlineUpdated(
+                    story_id=story_id,
+                    representation_type=story.representation_type,
+                    bounding_data=story.bounding_data,
+                ))
+
+            story = Story.get_by_id(conn, story_id)
+            return self._story_to_dto(story)
+        finally:
+            conn.close()
+
+    def get_stories_for_canvas(self, project_id: int) -> List[StoryDTO]:
+        """Get all stories with their visual data for canvas rendering.
+
+        Same as list_stories() but name makes intent clear.
+        """
+        return self.list_stories(project_id)

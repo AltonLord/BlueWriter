@@ -12,6 +12,7 @@ from api.schemas import (
     StoryResponse,
     StoryPublishRequest,
     StoryReorderRequest,
+    StoryOutlineUpdate,
     MessageResponse,
 )
 from services.story_service import StoryService
@@ -33,6 +34,9 @@ def _story_to_response(story) -> StoryResponse:
         updated_at=story.updated_at,
         is_locked=story.is_locked,
         is_published=story.is_published,
+        representation_type=story.representation_type,
+        bounding_data=story.bounding_data,
+        outline_color=story.outline_color,
     )
 
 
@@ -164,3 +168,22 @@ async def reorder_stories(
         return MessageResponse(message="Stories reordered")
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.patch("/stories/{story_id}/outline", response_model=StoryResponse)
+async def update_story_outline(
+    story_id: int,
+    data: StoryOutlineUpdate,
+    service: StoryService = Depends(get_story_service),
+):
+    """Update a story's visual outline data (bounding_data, representation_type, outline_color)."""
+    try:
+        story = service.update_story_outline(
+            story_id=story_id,
+            representation_type=data.representation_type,
+            bounding_data=data.bounding_data,
+            outline_color=data.outline_color,
+        )
+        return _story_to_response(story)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))

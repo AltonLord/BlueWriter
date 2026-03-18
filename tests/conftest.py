@@ -118,6 +118,7 @@ class EventRecorder:
             ProjectCreated, ProjectUpdated, ProjectDeleted, ProjectOpened,
             StoryCreated, StoryUpdated, StoryDeleted, StorySelected,
             StoryPublished, StoryUnpublished, StoriesReordered,
+            StoryOutlineUpdated, ProjectCanvasLoaded,
             ChapterCreated, ChapterUpdated, ChapterDeleted, ChapterMoved,
             ChapterColorChanged, ChapterOpened, ChapterClosed,
             EntryCreated, EntryUpdated, EntryDeleted, EntryOpened, EntryClosed,
@@ -125,11 +126,12 @@ class EventRecorder:
             EditorStateChanged, EditorModifiedChanged,
             AppStateChanged, SaveRequested, SaveCompleted,
         )
-        
+
         event_types = [
             ProjectCreated, ProjectUpdated, ProjectDeleted, ProjectOpened,
             StoryCreated, StoryUpdated, StoryDeleted, StorySelected,
             StoryPublished, StoryUnpublished, StoriesReordered,
+            StoryOutlineUpdated, ProjectCanvasLoaded,
             ChapterCreated, ChapterUpdated, ChapterDeleted, ChapterMoved,
             ChapterColorChanged, ChapterOpened, ChapterClosed,
             EntryCreated, EntryUpdated, EntryDeleted, EntryOpened, EntryClosed,

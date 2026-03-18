@@ -169,17 +169,55 @@ def register_story_tools(mcp: FastMCP, get_api_base: Callable[[], str]) -> None:
     @mcp.tool()
     def reorder_stories(project_id: int, story_ids: List[int]) -> str:
         """Reorder stories within a project.
-        
+
         Args:
             project_id: The ID of the project
             story_ids: List of story IDs in the desired order
-            
+
         Returns:
             Confirmation message.
         """
         response = httpx.put(
             f"{get_api_base()}/projects/{project_id}/stories/order",
             json={"story_ids": story_ids}
+        )
+        response.raise_for_status()
+        return response.text
+
+    @mcp.tool()
+    def update_story_outline(
+        story_id: int,
+        representation_type: str = None,
+        bounding_data: str = None,
+        outline_color: str = None
+    ) -> str:
+        """Update a story's visual outline on the canvas.
+
+        Stories can be represented as a bounding box or a red yarn string
+        connecting chapters. This updates the visual representation data.
+
+        Args:
+            story_id: The ID of the story to update
+            representation_type: "box" for bounding rectangle or "string" for yarn path (optional)
+            bounding_data: JSON string with outline data (optional).
+                For box: {"x1": 100, "y1": 80, "x2": 600, "y2": 450}
+                For string: {"chapter_ids": [3, 1, 5, 2]}
+            outline_color: Hex color for the outline, e.g. "#4A90D9" (optional)
+
+        Returns:
+            JSON object with the updated story details.
+        """
+        data = {}
+        if representation_type is not None:
+            data["representation_type"] = representation_type
+        if bounding_data is not None:
+            data["bounding_data"] = bounding_data
+        if outline_color is not None:
+            data["outline_color"] = outline_color
+
+        response = httpx.patch(
+            f"{get_api_base()}/stories/{story_id}/outline",
+            json=data
         )
         response.raise_for_status()
         return response.text

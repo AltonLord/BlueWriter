@@ -26,6 +26,7 @@ def _chapter_to_response(chapter) -> ChapterResponse:
     return ChapterResponse(
         id=chapter.id,
         story_id=chapter.story_id,
+        project_id=chapter.project_id,
         title=chapter.title,
         summary=chapter.summary,
         content=chapter.content,
@@ -222,3 +223,36 @@ async def close_chapter(
         return MessageResponse(message=f"Chapter {chapter_id} closed")
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
+
+
+@router.get("/projects/{project_id}/chapters", response_model=List[ChapterResponse])
+async def list_project_chapters(
+    project_id: int,
+    service: ChapterService = Depends(get_chapter_service),
+):
+    """List all chapters in a project (across all stories and orphans)."""
+    chapters = service.list_all_chapters_for_project(project_id)
+    return [_chapter_to_response(c) for c in chapters]
+
+
+@router.post("/projects/{project_id}/chapters", response_model=ChapterResponse, status_code=201)
+async def create_project_chapter(
+    project_id: int,
+    data: ChapterCreate,
+    service: ChapterService = Depends(get_chapter_service),
+):
+    """Create a new chapter in a project, optionally attached to a story."""
+    try:
+        chapter = service.create_chapter(
+            story_id=data.story_id,
+            title=data.title,
+            board_x=data.board_x,
+            board_y=data.board_y,
+            color=data.color,
+            project_id=project_id,
+        )
+        return _chapter_to_response(chapter)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except RuntimeError as e:
+        raise HTTPException(status_code=409, detail=str(e))

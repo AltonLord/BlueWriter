@@ -217,16 +217,75 @@ class TestStoriesAPI:
         s1 = client.post(f"/projects/{project_id}/stories", json={"title": "First"}).json()
         s2 = client.post(f"/projects/{project_id}/stories", json={"title": "Second"}).json()
         s3 = client.post(f"/projects/{project_id}/stories", json={"title": "Third"}).json()
-        
+
         # Reorder: Third, First, Second
         response = client.put(f"/projects/{project_id}/stories/order", json={
             "story_ids": [s3["id"], s1["id"], s2["id"]]
         })
-        
+
         assert response.status_code == 200
-        
+
         # Verify order
         stories = client.get(f"/projects/{project_id}/stories").json()
         assert stories[0]["id"] == s3["id"]
         assert stories[1]["id"] == s1["id"]
         assert stories[2]["id"] == s2["id"]
+
+    # =========================================================================
+    # Story Outline (BLU-002)
+    # =========================================================================
+
+    def test_update_story_outline(self, client, project_id):
+        """Test PATCH story outline endpoint."""
+        create_response = client.post(f"/projects/{project_id}/stories", json={
+            "title": "Outline Test"
+        })
+        story_id = create_response.json()["id"]
+
+        response = client.patch(f"/stories/{story_id}/outline", json={
+            "representation_type": "string",
+            "outline_color": "#FF0000"
+        })
+
+        assert response.status_code == 200
+        story = response.json()
+        assert story["representation_type"] == "string"
+        assert story["outline_color"] == "#FF0000"
+
+    def test_update_story_outline_bounding_data(self, client, project_id):
+        """Test updating bounding data via outline endpoint."""
+        import json
+        create_response = client.post(f"/projects/{project_id}/stories", json={
+            "title": "Bounding Test"
+        })
+        story_id = create_response.json()["id"]
+        bounding = json.dumps({"x1": 0, "y1": 0, "x2": 500, "y2": 400})
+
+        response = client.patch(f"/stories/{story_id}/outline", json={
+            "bounding_data": bounding
+        })
+
+        assert response.status_code == 200
+        story = response.json()
+        assert story["bounding_data"] == bounding
+
+    def test_update_story_outline_not_found(self, client):
+        """Test outline update for non-existent story."""
+        response = client.patch("/stories/99999/outline", json={
+            "representation_type": "box"
+        })
+
+        assert response.status_code == 404
+
+    def test_story_response_includes_outline_fields(self, client, project_id):
+        """Test that story responses include outline fields."""
+        create_response = client.post(f"/projects/{project_id}/stories", json={
+            "title": "Fields Test"
+        })
+
+        story = create_response.json()
+        assert "representation_type" in story
+        assert "bounding_data" in story
+        assert "outline_color" in story
+        assert story["representation_type"] == "box"
+        assert story["outline_color"] == "#4A90D9"

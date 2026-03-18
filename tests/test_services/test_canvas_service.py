@@ -150,11 +150,62 @@ class TestCanvasService:
         """Test clearing all view states."""
         canvas_service.set_pan(story_id=1, x=100.0, y=100.0)
         canvas_service.set_pan(story_id=2, x=200.0, y=200.0)
-        
+
         canvas_service.clear_all()
-        
+
         view1 = canvas_service.get_view(story_id=1)
         view2 = canvas_service.get_view(story_id=2)
-        
+
         assert view1.pan_x == 0.0
         assert view2.pan_x == 0.0
+
+    # =========================================================================
+    # Frame Story Tests (BLU-002)
+    # =========================================================================
+
+    def test_frame_story_with_positions(self, canvas_service, event_recorder):
+        """Test framing a story zooms to contain chapter positions."""
+        import json
+        bounding = json.dumps({"x1": 100, "y1": 100, "x2": 500, "y2": 400})
+        chapter_positions = [
+            (150, 150),
+            (400, 300),
+        ]
+        event_recorder.clear()
+
+        view = canvas_service.frame_story(
+            project_id=1,
+            bounding_data=bounding,
+            chapter_positions=chapter_positions,
+        )
+
+        assert view is not None
+        # Should have adjusted zoom/pan
+        assert view.pan_x != 0.0 or view.pan_y != 0.0 or view.zoom != 1.0
+
+    def test_frame_story_no_bounding_uses_chapters(self, canvas_service):
+        """Test framing without bounding_data falls back to chapter positions."""
+        chapter_positions = [
+            (0, 0),
+            (800, 600),
+        ]
+
+        view = canvas_service.frame_story(
+            project_id=1,
+            bounding_data=None,
+            chapter_positions=chapter_positions,
+        )
+
+        assert view is not None
+
+    def test_frame_story_empty_chapters(self, canvas_service):
+        """Test framing with no chapter positions returns default view."""
+        view = canvas_service.frame_story(
+            project_id=1,
+            bounding_data=None,
+            chapter_positions=[],
+        )
+
+        assert view.pan_x == 0.0
+        assert view.pan_y == 0.0
+        assert view.zoom == 1.0

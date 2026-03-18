@@ -274,7 +274,72 @@ class TestChapterService:
     def test_close_chapter(self, chapter_service, sample_chapter, event_recorder):
         """Test closing a chapter emits event."""
         event_recorder.clear()
-        
+
         chapter_service.close_chapter(sample_chapter.id)
-        
+
         assert event_recorder.has_event(ChapterClosed)
+
+    # =========================================================================
+    # Orphan Chapter Tests (BLU-002)
+    # =========================================================================
+
+    def test_create_orphan_chapter(self, chapter_service, sample_project):
+        """Test creating a chapter without a story (orphan)."""
+        chapter = chapter_service.create_chapter(
+            story_id=None,
+            title="Orphan Chapter",
+            project_id=sample_project.id,
+        )
+
+        assert chapter.id is not None
+        assert chapter.story_id is None
+        assert chapter.project_id == sample_project.id
+        assert chapter.title == "Orphan Chapter"
+
+    def test_orphan_chapter_is_editable(self, chapter_service, sample_project):
+        """Test that orphan chapters can be updated (no lock check)."""
+        chapter = chapter_service.create_chapter(
+            story_id=None,
+            title="Editable Orphan",
+            project_id=sample_project.id,
+        )
+
+        updated = chapter_service.update_chapter(
+            chapter.id,
+            title="Updated Orphan"
+        )
+
+        assert updated.title == "Updated Orphan"
+
+    def test_list_all_chapters_for_project(self, chapter_service, story_service, sample_project):
+        """Test listing all chapters across stories and orphans."""
+        # Create a story with chapters
+        story = story_service.create_story(
+            project_id=sample_project.id,
+            title="Story A"
+        )
+        chapter_service.create_chapter(story_id=story.id, title="Ch in Story")
+
+        # Create an orphan chapter
+        chapter_service.create_chapter(
+            story_id=None,
+            title="Orphan Ch",
+            project_id=sample_project.id,
+        )
+
+        # List all
+        all_chapters = chapter_service.list_all_chapters_for_project(sample_project.id)
+
+        assert len(all_chapters) == 2
+        titles = [c.title for c in all_chapters]
+        assert "Ch in Story" in titles
+        assert "Orphan Ch" in titles
+
+    def test_chapter_has_project_id(self, chapter_service, sample_story, sample_project):
+        """Test that chapters created with a story have project_id set."""
+        chapter = chapter_service.create_chapter(
+            story_id=sample_story.id,
+            title="Has Project"
+        )
+
+        assert chapter.project_id == sample_project.id

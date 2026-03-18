@@ -247,13 +247,73 @@ def register_chapter_tools(mcp: FastMCP, get_api_base: Callable[[], str]) -> Non
     @mcp.tool()
     def close_chapter(chapter_id: int) -> str:
         """Close a chapter's editor window.
-        
+
         Args:
             chapter_id: The ID of the chapter to close
-            
+
         Returns:
             Confirmation message.
         """
         response = httpx.post(f"{get_api_base()}/chapters/{chapter_id}/close")
+        response.raise_for_status()
+        return response.text
+
+    @mcp.tool()
+    def list_project_chapters(project_id: int) -> str:
+        """List all chapters in a project across all stories and orphans.
+
+        Returns all chapters on the unified canvas for a project,
+        including chapters that belong to stories and orphan chapters
+        that are not attached to any story.
+
+        Args:
+            project_id: The ID of the project
+
+        Returns:
+            JSON array of chapters with id, story_id (may be null),
+            project_id, title, summary, board_x, board_y, and color fields.
+        """
+        response = httpx.get(f"{get_api_base()}/projects/{project_id}/chapters")
+        response.raise_for_status()
+        return response.text
+
+    @mcp.tool()
+    def create_project_chapter(
+        project_id: int,
+        title: str,
+        story_id: int = None,
+        board_x: int = 100,
+        board_y: int = 100,
+        color: str = "#FFFF88"
+    ) -> str:
+        """Create a new chapter in a project, optionally attached to a story.
+
+        Creates a chapter on the unified canvas. If no story_id is provided,
+        the chapter is created as an orphan (not attached to any story).
+
+        Args:
+            project_id: The ID of the project
+            title: The title of the new chapter
+            story_id: Optional story ID to attach the chapter to
+            board_x: X position on canvas (default: 100)
+            board_y: Y position on canvas (default: 100)
+            color: Sticky note color as hex, e.g. "#FFFF88" (default: yellow)
+
+        Returns:
+            JSON object with the created chapter details.
+        """
+        data = {
+            "title": title,
+            "board_x": board_x,
+            "board_y": board_y,
+            "color": color,
+        }
+        if story_id is not None:
+            data["story_id"] = story_id
+
+        response = httpx.post(
+            f"{get_api_base()}/projects/{project_id}/chapters",
+            json=data
+        )
         response.raise_for_status()
         return response.text

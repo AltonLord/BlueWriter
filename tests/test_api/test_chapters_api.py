@@ -270,9 +270,82 @@ class TestChaptersAPI:
             "title": "Scene Break Test"
         })
         chapter_id = create_response.json()["id"]
-        
+
         response = client.post(f"/chapters/{chapter_id}/scene-break", json={
             "position": -1
         })
-        
+
         assert response.status_code == 200
+
+    # =========================================================================
+    # Project Chapters (BLU-002)
+    # =========================================================================
+
+    @pytest.fixture
+    def project_id(self, client) -> int:
+        """Create a project and return its ID."""
+        project = client.post("/projects", json={"name": "Test Project"}).json()
+        return project["id"]
+
+    def test_list_project_chapters(self, client, project_id):
+        """Test listing all chapters in a project."""
+        # Create a story with chapters
+        story = client.post(f"/projects/{project_id}/stories", json={
+            "title": "Story A"
+        }).json()
+        client.post(f"/stories/{story['id']}/chapters", json={"title": "Ch 1"})
+        client.post(f"/stories/{story['id']}/chapters", json={"title": "Ch 2"})
+
+        # Create an orphan chapter
+        client.post(f"/projects/{project_id}/chapters", json={
+            "title": "Orphan"
+        })
+
+        response = client.get(f"/projects/{project_id}/chapters")
+
+        assert response.status_code == 200
+        chapters = response.json()
+        assert len(chapters) == 3
+        titles = [c["title"] for c in chapters]
+        assert "Ch 1" in titles
+        assert "Ch 2" in titles
+        assert "Orphan" in titles
+
+    def test_create_project_chapter_orphan(self, client, project_id):
+        """Test creating an orphan chapter via project endpoint."""
+        response = client.post(f"/projects/{project_id}/chapters", json={
+            "title": "Project Orphan",
+            "board_x": 200,
+            "board_y": 300
+        })
+
+        assert response.status_code == 201
+        chapter = response.json()
+        assert chapter["title"] == "Project Orphan"
+        assert chapter["story_id"] is None
+        assert chapter["project_id"] == project_id
+
+    def test_create_project_chapter_with_story(self, client, project_id):
+        """Test creating a chapter attached to a story via project endpoint."""
+        story = client.post(f"/projects/{project_id}/stories", json={
+            "title": "Target Story"
+        }).json()
+
+        response = client.post(f"/projects/{project_id}/chapters", json={
+            "title": "Attached Ch",
+            "story_id": story["id"]
+        })
+
+        assert response.status_code == 201
+        chapter = response.json()
+        assert chapter["story_id"] == story["id"]
+        assert chapter["project_id"] == project_id
+
+    def test_chapter_response_includes_project_id(self, client, story_id):
+        """Test that chapter responses include project_id."""
+        create_response = client.post(f"/stories/{story_id}/chapters", json={
+            "title": "PID Test"
+        })
+
+        chapter = create_response.json()
+        assert "project_id" in chapter

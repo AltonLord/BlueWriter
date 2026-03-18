@@ -98,6 +98,22 @@ class StoriesReordered(Event):
     story_ids: List[int]  # New order
 
 
+@dataclass
+class StoryOutlineUpdated(Event):
+    """Emitted when a story's visual outline data is updated."""
+    story_id: int
+    representation_type: str
+    bounding_data: Optional[str]
+
+
+@dataclass
+class ProjectCanvasLoaded(Event):
+    """Emitted when the unified canvas loads all data for a project."""
+    project_id: int
+    chapter_count: int
+    story_count: int
+
+
 # =============================================================================
 # Chapter Events
 # =============================================================================
@@ -277,6 +293,8 @@ __all__ = [
     'StoryPublished',
     'StoryUnpublished',
     'StoriesReordered',
+    'StoryOutlineUpdated',
+    'ProjectCanvasLoaded',
     # Chapter events
     'ChapterCreated',
     'ChapterUpdated',

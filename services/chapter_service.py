@@ -32,12 +32,12 @@ COLOR_PATTERN = re.compile(r'^#[0-9A-Fa-f]{6}$')
 @dataclass
 class ChapterDTO:
     """Data transfer object for chapters.
-    
+
     Used to pass chapter data between layers without
     exposing the database model directly.
     """
     id: int
-    story_id: int
+    story_id: Optional[int]
     title: str
     summary: str
     content: str
@@ -46,6 +46,7 @@ class ChapterDTO:
     color: str
     created_at: Optional[datetime]
     updated_at: Optional[datetime]
+    project_id: Optional[int] = None
 
 
 class ChapterService(BaseService):
@@ -104,18 +105,23 @@ class ChapterService(BaseService):
             color=chapter.color,
             created_at=chapter.created_at,
             updated_at=chapter.updated_at,
+            project_id=chapter.project_id,
         )
     
-    def _check_story_not_locked(self, conn, story_id: int) -> None:
+    def _check_story_not_locked(self, conn, story_id: Optional[int]) -> None:
         """Check that the parent story is not locked.
-        
+
+        Orphan chapters (story_id is None) are always editable.
+
         Args:
             conn: Database connection
-            story_id: The story's database ID
-            
+            story_id: The story's database ID (None for orphans)
+
         Raises:
             RuntimeError: If story is final published (locked)
         """
+        if story_id is None:
+            return
         story = Story.get_by_id(conn, story_id)
         if story is None:
             raise ValueError(f"Story {story_id} not found")
@@ -183,45 +189,56 @@ class ChapterService(BaseService):
     
     def create_chapter(
         self,
-        story_id: int,
-        title: str,
+        story_id: Optional[int] = None,
+        title: str = "",
         board_x: float = 100.0,
         board_y: float = 100.0,
         color: str = "#FFFF88",
+        project_id: Optional[int] = None,
     ) -> ChapterDTO:
-        """Create a new chapter in a story.
-        
+        """Create a new chapter, optionally in a story.
+
         Args:
-            story_id: The story's database ID
+            story_id: The story's database ID (None for orphan chapter)
             title: Chapter title (required)
             board_x: X position on canvas (default 100)
             board_y: Y position on canvas (default 100)
             color: Sticky note color as hex (default yellow #FFFF88)
-            
+            project_id: The project's database ID (required for orphans,
+                        auto-resolved from story if not provided)
+
         Returns:
             ChapterDTO with the created chapter data
-            
+
         Raises:
             ValueError: If title is empty or color format invalid
             RuntimeError: If story is locked
         """
         if not title or not title.strip():
             raise ValueError("Chapter title cannot be empty")
-        
+
         color = self._validate_color(color)
-        
+
         conn = self._get_connection()
         try:
             self._check_story_not_locked(conn, story_id)
-            
-            chapter = Chapter.create(conn, story_id, title.strip())
+
+            # Resolve project_id from story if not explicitly provided
+            resolved_project_id = project_id
+            if resolved_project_id is None and story_id is not None:
+                story = Story.get_by_id(conn, story_id)
+                if story:
+                    resolved_project_id = story.project_id
+
+            chapter = Chapter.create(conn, story_id, title.strip(),
+                                     project_id=resolved_project_id)
             chapter.board_x = board_x
             chapter.board_y = board_y
             chapter.color = color
             chapter.update(conn)
-            
+
             dto = self._chapter_to_dto(chapter)
-            
+
             # Emit event
             self.event_bus.publish(ChapterCreated(
                 chapter_id=dto.id,
@@ -231,7 +248,7 @@ class ChapterService(BaseService):
                 board_y=dto.board_y,
                 color=dto.color,
             ))
-            
+
             return dto
         finally:
             conn.close()
@@ -610,20 +627,38 @@ class ChapterService(BaseService):
         
         return dto
     
+    def list_all_chapters_for_project(self, project_id: int) -> List[ChapterDTO]:
+        """Get ALL chapters across all stories in a project, plus orphan chapters.
+
+        Used by the unified canvas to load everything at once.
+
+        Args:
+            project_id: The project's database ID
+
+        Returns:
+            List of ChapterDTO objects for the entire project
+        """
+        conn = self._get_connection()
+        try:
+            chapters = Chapter.get_by_project(conn, project_id)
+            return [self._chapter_to_dto(c) for c in chapters]
+        finally:
+            conn.close()
+
     def close_chapter(self, chapter_id: int) -> None:
         """Close a chapter editor.
-        
+
         Emits a ChapterClosed event that the UI can respond to.
-        
+
         Args:
             chapter_id: The chapter's database ID
-            
+
         Raises:
             ValueError: If chapter not found
         """
         # Validate chapter exists
         self.get_chapter(chapter_id)
-        
+
         # Emit event
         self.event_bus.publish(ChapterClosed(
             chapter_id=chapter_id,

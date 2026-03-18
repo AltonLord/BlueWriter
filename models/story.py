@@ -14,7 +14,7 @@ STATUS_ROUGH_PUBLISHED = "rough_published"
 STATUS_FINAL_PUBLISHED = "final_published"
 
 # Explicit column list for consistent ordering
-STORY_COLUMNS = "id, project_id, title, synopsis, sort_order, status, published_at, created_at, updated_at"
+STORY_COLUMNS = "id, project_id, title, synopsis, sort_order, status, published_at, created_at, updated_at, representation_type, bounding_data, outline_color"
 
 
 @dataclass
@@ -29,6 +29,9 @@ class Story:
     published_at: Optional[datetime] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
+    representation_type: str = "box"
+    bounding_data: Optional[str] = None
+    outline_color: str = "#4A90D9"
     
     @property
     def is_locked(self) -> bool:
@@ -52,7 +55,10 @@ class Story:
             status=row[5] if row[5] else STATUS_DRAFT,
             published_at=datetime.fromisoformat(row[6]) if row[6] else None,
             created_at=datetime.fromisoformat(row[7]) if row[7] else None,
-            updated_at=datetime.fromisoformat(row[8]) if row[8] else None
+            updated_at=datetime.fromisoformat(row[8]) if row[8] else None,
+            representation_type=row[9] if row[9] else "box",
+            bounding_data=row[10] if len(row) > 10 else None,
+            outline_color=row[11] if len(row) > 11 and row[11] else "#4A90D9",
         )
     
     @classmethod
@@ -114,11 +120,15 @@ class Story:
             raise ValueError("Cannot modify a final published story. Unpublish first.")
         cursor = conn.cursor()
         cursor.execute(
-            """UPDATE stories SET title = ?, synopsis = ?, sort_order = ?, 
-               status = ?, published_at = ?, updated_at = CURRENT_TIMESTAMP 
+            """UPDATE stories SET title = ?, synopsis = ?, sort_order = ?,
+               status = ?, published_at = ?, representation_type = ?,
+               bounding_data = ?, outline_color = ?,
+               updated_at = CURRENT_TIMESTAMP
                WHERE id = ?""",
             (self.title, self.synopsis, self.sort_order, self.status,
-             self.published_at.isoformat() if self.published_at else None, self.id)
+             self.published_at.isoformat() if self.published_at else None,
+             self.representation_type, self.bounding_data, self.outline_color,
+             self.id)
         )
         conn.commit()
     

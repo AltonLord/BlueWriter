@@ -6,7 +6,8 @@ Tests all CRUD operations, publishing, and event emission for stories.
 import pytest
 from events.events import (
     StoryCreated, StoryUpdated, StoryDeleted, StorySelected,
-    StoryPublished, StoryUnpublished, StoriesReordered
+    StoryPublished, StoryUnpublished, StoriesReordered,
+    StoryOutlineUpdated
 )
 
 
@@ -224,13 +225,106 @@ class TestStoryService:
         s2 = story_service.create_story(project_id=sample_project.id, title="Second")
         s3 = story_service.create_story(project_id=sample_project.id, title="Third")
         event_recorder.clear()
-        
+
         # Reorder: Third, First, Second
         story_service.reorder_stories(sample_project.id, [s3.id, s1.id, s2.id])
-        
+
         stories = story_service.list_stories(sample_project.id)
         assert stories[0].id == s3.id
         assert stories[1].id == s1.id
         assert stories[2].id == s2.id
-        
+
         assert event_recorder.has_event(StoriesReordered)
+
+    # =========================================================================
+    # Outline Update Tests (BLU-002)
+    # =========================================================================
+
+    def test_update_story_outline_representation_type(self, story_service, sample_story, event_recorder):
+        """Test updating story outline representation type."""
+        event_recorder.clear()
+
+        updated = story_service.update_story_outline(
+            sample_story.id,
+            representation_type="string"
+        )
+
+        assert updated.representation_type == "string"
+        assert event_recorder.has_event(StoryOutlineUpdated)
+
+    def test_update_story_outline_bounding_data(self, story_service, sample_story):
+        """Test updating story bounding data."""
+        import json
+        bounding = json.dumps({"x1": 10, "y1": 20, "x2": 300, "y2": 400})
+
+        updated = story_service.update_story_outline(
+            sample_story.id,
+            bounding_data=bounding
+        )
+
+        assert updated.bounding_data == bounding
+
+    def test_update_story_outline_color(self, story_service, sample_story):
+        """Test updating story outline color."""
+        updated = story_service.update_story_outline(
+            sample_story.id,
+            outline_color="#FF0000"
+        )
+
+        assert updated.outline_color == "#FF0000"
+
+    def test_update_story_outline_bypasses_lock(self, story_service, sample_story):
+        """Test that outline updates work even on final-published stories."""
+        story_service.publish_story(sample_story.id, final=True)
+
+        # Should NOT raise RuntimeError
+        updated = story_service.update_story_outline(
+            sample_story.id,
+            representation_type="string",
+            outline_color="#00FF00"
+        )
+
+        assert updated.representation_type == "string"
+        assert updated.outline_color == "#00FF00"
+
+    def test_update_story_outline_not_found(self, story_service):
+        """Test updating outline of non-existent story."""
+        with pytest.raises(ValueError, match="not found"):
+            story_service.update_story_outline(99999, representation_type="box")
+
+    def test_get_stories_for_canvas(self, story_service, sample_project):
+        """Test get_stories_for_canvas returns all stories."""
+        story_service.create_story(project_id=sample_project.id, title="Canvas A")
+        story_service.create_story(project_id=sample_project.id, title="Canvas B")
+
+        stories = story_service.get_stories_for_canvas(sample_project.id)
+
+        assert len(stories) == 2
+        titles = [s.title for s in stories]
+        assert "Canvas A" in titles
+        assert "Canvas B" in titles
+
+    def test_story_has_default_outline_fields(self, story_service, sample_project):
+        """Test that newly created stories have default outline fields."""
+        story = story_service.create_story(
+            project_id=sample_project.id,
+            title="Default Outline"
+        )
+
+        assert story.representation_type == "box"
+        assert story.outline_color == "#4A90D9"
+        assert story.bounding_data is None
+
+    def test_delete_story_keeps_chapters(self, story_service, chapter_service, sample_story):
+        """Test that deleting a story keeps its chapters as orphans."""
+        ch = chapter_service.create_chapter(
+            story_id=sample_story.id,
+            title="Orphan-to-be"
+        )
+
+        story_service.delete_story(sample_story.id)
+
+        # Chapter should still exist as orphan
+        fetched = chapter_service.get_chapter(ch.id)
+        assert fetched.id == ch.id
+        assert fetched.story_id is None

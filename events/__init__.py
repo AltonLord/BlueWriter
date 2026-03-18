@@ -76,6 +76,8 @@ from events.events import (
     StoryPublished,
     StoryUnpublished,
     StoriesReordered,
+    StoryOutlineUpdated,
+    ProjectCanvasLoaded,
     # Chapter events
     ChapterCreated,
     ChapterUpdated,
@@ -117,6 +119,8 @@ __all__ = [
     'StoryPublished',
     'StoryUnpublished',
     'StoriesReordered',
+    'StoryOutlineUpdated',
+    'ProjectCanvasLoaded',
     # Chapter events
     'ChapterCreated',
     'ChapterUpdated',
