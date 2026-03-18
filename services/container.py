@@ -62,30 +62,60 @@ class ServiceContainer:
     def project(self) -> ProjectService:
         """Get the ProjectService."""
         return self._services['project']
-    
+
+    @property
+    def project_service(self) -> ProjectService:
+        """Alias for project."""
+        return self._services['project']
+
     @property
     def story(self) -> StoryService:
         """Get the StoryService."""
         return self._services['story']
-    
+
+    @property
+    def story_service(self) -> StoryService:
+        """Alias for story — matches main_window attribute access pattern."""
+        return self._services['story']
+
     @property
     def chapter(self) -> ChapterService:
         """Get the ChapterService."""
         return self._services['chapter']
-    
+
+    @property
+    def chapter_service(self) -> ChapterService:
+        """Alias for chapter."""
+        return self._services['chapter']
+
     @property
     def encyclopedia(self) -> EncyclopediaService:
         """Get the EncyclopediaService."""
         return self._services['encyclopedia']
-    
+
+    @property
+    def encyclopedia_service(self) -> EncyclopediaService:
+        """Alias for encyclopedia."""
+        return self._services['encyclopedia']
+
     @property
     def canvas(self) -> CanvasService:
         """Get the CanvasService."""
         return self._services['canvas']
-    
+
+    @property
+    def canvas_service(self) -> CanvasService:
+        """Alias for canvas."""
+        return self._services['canvas']
+
     @property
     def editor(self) -> EditorService:
         """Get the EditorService."""
+        return self._services['editor']
+
+    @property
+    def editor_service(self) -> EditorService:
+        """Alias for editor."""
         return self._services['editor']
     
     def as_dict(self) -> Dict[str, Any]:
